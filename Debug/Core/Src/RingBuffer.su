@@ -1,0 +1,9 @@
+RingBuffer.c:11:6:RingBuffer_Init	16	static
+RingBuffer.c:21:13:buffer_write_char	16	static
+RingBuffer.c:42:6:RB_Buff_Write_String	16	static
+RingBuffer.c:52:6:RB_Buff_Write	16	static
+RingBuffer.c:70:6:RB_Buff_Read	16	static
+RingBuffer.c:88:9:RB_is_empty	16	static
+RingBuffer.c:96:9:RB_is_full	16	static
+RingBuffer.c:104:9:RB_get_data_counter	16	static
+RingBuffer.c:109:6:RB_Flush	16	static

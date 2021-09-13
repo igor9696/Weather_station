@@ -1,0 +1,12 @@
+BMP280.c:14:16:read8	48	static
+BMP280.c:21:17:read16	48	static
+BMP280.c:28:13:temp_press_burst_read	32	static
+BMP280.c:33:13:write8	32	static
+BMP280.c:39:6:BMP280_set_mode	24	static
+BMP280.c:65:6:BMP280_set_temp_OVS	24	static
+BMP280.c:75:6:BMP280_set_press_OVS	24	static
+BMP280.c:85:6:BMP280_set_filter	24	static
+BMP280.c:95:16:BMP280_temp_compensate	32	static
+BMP280.c:106:17:BMP280_press_compensate	32	static
+BMP280.c:137:6:BMP280_get_data_FORCED	48	static
+BMP280.c:161:12:BMP280_Init	32	static
