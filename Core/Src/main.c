@@ -60,6 +60,11 @@ uint32_t bmp_press;
 uint8_t dht11_humidity;
 int8_t dht11_temp;
 uint8_t dht11_check_sum;
+
+
+uint16_t sensors_data_buff[4];
+
+const char API_Key[] = "BYP1JBKZ6647ICZ7"; // ThingSpeak Key
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -115,7 +120,7 @@ int main(void)
   delay_init();
   DHT11_Init(&DHT11, DHT11_SIGNAL_GPIO_Port, DHT11_SIGNAL_Pin);
   BMP280_Init(&hi2c1, 0x77);
-  ESP8266_Init(&ESP_module, "XXXX", "XXXXXX", AP_STATION);
+  ESP8266_Init(&ESP_module, "XXXX", "XXXX", AP_STATION);
 
   /* USER CODE END 2 */
 
@@ -123,10 +128,19 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_Delay(3000);
 	  HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 	  BMP280_get_data_FORCED(&bmp_temp, &bmp_press);
 	  DHT11_get_data(&DHT11, &dht11_humidity, &dht11_temp, &dht11_check_sum);
+
+	  sensors_data_buff[0] = bmp_temp;
+	  sensors_data_buff[1] = bmp_press;
+	  sensors_data_buff[2] = dht11_humidity;
+	  //DHT11_get_data(&DHT11, &dht11_humidity, &dht11_temp, &dht11_check_sum);
+	  //ESP8266_TS_Send_Data_SingleField(&ESP_module, 2, bmp_temp);
+
+	  ESP8266_TS_Send_Data_MultiField(&ESP_module, sensors_data_buff);
+	  HAL_Delay(15000);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
