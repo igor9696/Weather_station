@@ -9,7 +9,7 @@
 #define INC_RINGBUFFER_H_
 #include "main.h"
 
-#define BUFFER_SIZE		64
+#define BUFFER_SIZE		128
 
 
 typedef struct RingBuffer_t

@@ -111,4 +111,5 @@ void RB_Flush(RingBuffer_t* RingBuffer)
 	// clear buffer
 	RingBuffer->head = 0;
 	RingBuffer->tail = 0;
+	RingBuffer->data_counter = 0;
 }

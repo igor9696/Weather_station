@@ -17,7 +17,7 @@
 
 
 #define ESP_RESPOND_TIME 		100 // 100ms
-#define ESP_MessageSize			64
+#define ESP_MessageSize			128
 
 
 typedef enum ESP_status
@@ -33,13 +33,19 @@ typedef enum ESP_mode
 	AP_STATION,
 }ESP_mode;
 
+typedef enum ESP_ConnectionMode
+{
+	SINGLE_CONNECTION,
+	MULTIPLE_CONNECTION,
+}ESP_ConnectionMode;
+
 typedef struct ESP8266_t
 {
 	char* 			SSID;
 	char* 			PSWD;
-	RingBuffer_t 	ESP_TX_Buff;
 	RingBuffer_t 	ESP_RX_Buff;
 	uint8_t 		MessageReceive[ESP_MessageSize];
+	ESP_status		ESP8266_status;
 }ESP8266_t;
 
 
@@ -47,8 +53,9 @@ typedef struct ESP8266_t
 // function prototypes
 ESP_status ESP8266_Init(ESP8266_t* ESP, char* SSID, char* PSWD, ESP_mode Mode);
 ESP_status ESP8266_SetMode(ESP8266_t* ESP, ESP_mode mode);
-
-
+ESP_status ESP8266_Connect_TCP(ESP8266_t* ESP, char* Target_IP, char* PORT, ESP_ConnectionMode mode);
+ESP_status ESP8266_TS_Send_Data_SingleField(ESP8266_t* ESP, uint8_t field_number, uint16_t data);
+ESP_status ESP8266_TS_Send_Data_MultiField(ESP8266_t* ESP, uint16_t data_buffer[]);
 
 
 #endif /* INC_ESP01_H_ */

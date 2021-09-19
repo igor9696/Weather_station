@@ -10,7 +10,7 @@
 void UART_send_string(char* message)
 {
 	uint8_t length;
-	uint8_t message_buf[32];
+	uint8_t message_buf[64];
 	length = sprintf((char*)message_buf, message);
 	HAL_UART_Transmit(UART, message_buf, length, 100);
 }
