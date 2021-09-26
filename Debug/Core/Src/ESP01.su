@@ -1,11 +1,7 @@
-ESP01.c:13:19:ESP8266_Check_OK_Respond	16	static
-ESP01.c:31:19:ESP8266_is_TCP_disconnected	16	static
-ESP01.c:51:19:ESP8266_CheckAT	16	static
-ESP01.c:66:19:ESP8266_Connect_To_Router	64	static
+ESP01.c:13:19:ESP8266_Check_OK_Respond	8	static
 ESP01.c:84:12:ESP8266_SetMode	16	static
-ESP01.c:113:12:ESP8266_Init	24	static
+ESP01.c:113:12:ESP8266_Init	56	static
 ESP01.c:139:12:ESP8266_SetConnectionMode	16	static
-ESP01.c:162:12:ESP8266_Connect_TCP	168	static
+ESP01.c:162:12:ESP8266_Connect_TCP	152	static
 ESP01.c:188:12:ESP8266_Disconnect_TCP	16	static
-ESP01.c:202:12:ESP8266_TS_Send_Data_SingleField	128	static
-ESP01.c:238:12:ESP8266_TS_Send_Data_MultiField	24	static
+ESP01.c:206:12:ESP8266_TS_Send_Data_MultiField	216	static

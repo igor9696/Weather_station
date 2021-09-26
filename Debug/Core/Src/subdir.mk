@@ -7,6 +7,7 @@
 C_SRCS += \
 ../Core/Src/BMP280.c \
 ../Core/Src/ESP01.c \
+../Core/Src/INA219.c \
 ../Core/Src/RingBuffer.c \
 ../Core/Src/Utilis.c \
 ../Core/Src/delay.c \
@@ -26,6 +27,7 @@ C_SRCS += \
 OBJS += \
 ./Core/Src/BMP280.o \
 ./Core/Src/ESP01.o \
+./Core/Src/INA219.o \
 ./Core/Src/RingBuffer.o \
 ./Core/Src/Utilis.o \
 ./Core/Src/delay.o \
@@ -45,6 +47,7 @@ OBJS += \
 C_DEPS += \
 ./Core/Src/BMP280.d \
 ./Core/Src/ESP01.d \
+./Core/Src/INA219.d \
 ./Core/Src/RingBuffer.d \
 ./Core/Src/Utilis.d \
 ./Core/Src/delay.d \
@@ -64,5 +67,5 @@ C_DEPS += \
 
 # Each subdirectory must supply rules for building sources it contributes
 Core/Src/%.o: ../Core/Src/%.c Core/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L031xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfloat-abi=soft -mthumb -o "$@"
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L031xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -Os -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfloat-abi=soft -mthumb -o "$@"
 

@@ -199,21 +199,39 @@ ESP_status ESP8266_Disconnect_TCP(ESP8266_t* ESP)
 	return ESP_OK;
 }
 
-ESP_status ESP8266_TS_Send_Data_SingleField(ESP8266_t* ESP, uint8_t field_number, uint16_t data)
+
+
+
+
+ESP_status ESP8266_TS_Send_Data_MultiField(ESP8266_t* ESP, uint8_t number_of_fields, uint16_t data_buffer[])
 {
 	if(ESP8266_Connect_TCP(ESP, "184.106.153.149", "80", SINGLE_CONNECTION) != ESP_OK)
 	{
 		ESP->ESP8266_status = ESP_NOK;
 	}
 
-	uint8_t tmp_mess[25];
-	uint8_t tmp_length;
-	uint8_t message[64];
-	uint8_t length;
-	length = sprintf((char*)message, "GET /update?api_key=%s&field%d=%d\r\n", API_Key, field_number, data);
-	tmp_length = sprintf((char*)tmp_mess, "AT+CIPSEND=%d\r\n", length);
+	char cipsend_buff[25] = {0};
+	char field_buff[35] = {0};
+	char message[128] = {0};
 
-	UART_send_message((char*)tmp_mess, tmp_length);  // send data length
+	// prepare message
+	sprintf(message, "GET /update?api_key=%s", API_Key);
+	for(int i = 1; i < number_of_fields + 1; i++)
+	{
+		sprintf(field_buff, "&field%d=%u", i, data_buffer[i - 1]);
+		strcat(message, field_buff);
+	}
+
+//	for(int i=4; i < number_of_fields + 1; i++)
+//	{
+//		sprintf(field_buff, "&field%d=%g", i, data_buffer[i]);
+//		strcat(message, field_buff);
+//	}
+	strcat(message, "\r\n");
+
+	// send data length information
+	sprintf(cipsend_buff, "AT+CIPSEND=%d\r\n", strlen(message));
+	UART_send_message(cipsend_buff, strlen(cipsend_buff));
 	HAL_Delay(ESP_RESPOND_TIME);
 
 	if(ESP8266_Check_OK_Respond(ESP) != ESP_OK)
@@ -221,8 +239,8 @@ ESP_status ESP8266_TS_Send_Data_SingleField(ESP8266_t* ESP, uint8_t field_number
 		ESP->ESP8266_status = ESP_NOK;
 	}
 
-	UART_send_message((char*)message, length); // send data
-	HAL_Delay(2000);
+	UART_send_message(message, strlen(message)); // send data
+	HAL_Delay(1000);
 
 	// if TCP isn't closed
 	if(ESP8266_is_TCP_disconnected(ESP) != ESP_OK)
@@ -231,18 +249,6 @@ ESP_status ESP8266_TS_Send_Data_SingleField(ESP8266_t* ESP, uint8_t field_number
 	}
 
 	ESP->ESP8266_status = ESP_OK;
-	return ESP_OK;
-}
-
-
-ESP_status ESP8266_TS_Send_Data_MultiField(ESP8266_t* ESP, uint16_t data_buffer[])
-{
-	for(int i=1; i<4; i++)
-	{
-		ESP8266_TS_Send_Data_SingleField(ESP, i, data_buffer[i - 1]);
-		HAL_Delay(1000);
-	}
-
 	return ESP_OK;
 }
 
