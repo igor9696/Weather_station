@@ -1,5 +1,6 @@
 "./Core/Src/BMP280.o"
 "./Core/Src/ESP01.o"
+"./Core/Src/INA219.o"
 "./Core/Src/RingBuffer.o"
 "./Core/Src/Utilis.o"
 "./Core/Src/delay.o"

@@ -54,8 +54,7 @@ typedef struct ESP8266_t
 ESP_status ESP8266_Init(ESP8266_t* ESP, char* SSID, char* PSWD, ESP_mode Mode);
 ESP_status ESP8266_SetMode(ESP8266_t* ESP, ESP_mode mode);
 ESP_status ESP8266_Connect_TCP(ESP8266_t* ESP, char* Target_IP, char* PORT, ESP_ConnectionMode mode);
-ESP_status ESP8266_TS_Send_Data_SingleField(ESP8266_t* ESP, uint8_t field_number, uint16_t data);
-ESP_status ESP8266_TS_Send_Data_MultiField(ESP8266_t* ESP, uint16_t data_buffer[]);
+ESP_status ESP8266_TS_Send_Data_MultiField(ESP8266_t* ESP, uint8_t number_of_fields, uint16_t data_buffer[]);
 
 
 #endif /* INC_ESP01_H_ */

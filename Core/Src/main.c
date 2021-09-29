@@ -31,7 +31,7 @@
 #include "dht11.h"
 #include "ESP01.h"
 #include "Utilis.h"
-
+#include "INA219.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,10 +60,12 @@ uint32_t bmp_press;
 uint8_t dht11_humidity;
 int8_t dht11_temp;
 uint8_t dht11_check_sum;
+uint16_t solar_voltage;
+uint8_t solar_current;
 
+uint16_t sensors_data_buff[5];
 
-uint16_t sensors_data_buff[4];
-
+uint8_t INA_I2C_ADDR = 0x40;
 const char API_Key[] = "BYP1JBKZ6647ICZ7"; // ThingSpeak Key
 /* USER CODE END PV */
 
@@ -116,11 +118,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
   //HAL_UARTEx_ReceiveToIdle_DMA(&huart2, UART_RX_val, 32);
   HAL_UART_Receive_IT(&huart2, &UART_RX_val, 1);
-
+  INA219_Init(&hi2c1, INA_I2C_ADDR);
   delay_init();
   DHT11_Init(&DHT11, DHT11_SIGNAL_GPIO_Port, DHT11_SIGNAL_Pin);
   BMP280_Init(&hi2c1, 0x77);
-  ESP8266_Init(&ESP_module, "XXXX", "XXXX", AP_STATION);
+  ESP8266_Init(&ESP_module, "t-mobil", "19962016igor", AP_STATION);
 
   /* USER CODE END 2 */
 
@@ -129,17 +131,18 @@ int main(void)
   while (1)
   {
 	  HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+	  INA219_Get_Data_OneShot(&solar_voltage, &solar_current);
 	  BMP280_get_data_FORCED(&bmp_temp, &bmp_press);
 	  DHT11_get_data(&DHT11, &dht11_humidity, &dht11_temp, &dht11_check_sum);
 
 	  sensors_data_buff[0] = bmp_temp;
 	  sensors_data_buff[1] = bmp_press;
 	  sensors_data_buff[2] = dht11_humidity;
-	  //DHT11_get_data(&DHT11, &dht11_humidity, &dht11_temp, &dht11_check_sum);
-	  //ESP8266_TS_Send_Data_SingleField(&ESP_module, 2, bmp_temp);
+	  sensors_data_buff[3] = solar_voltage;
+	  sensors_data_buff[4] = solar_current;
 
-	  ESP8266_TS_Send_Data_MultiField(&ESP_module, sensors_data_buff);
-	  HAL_Delay(15000);
+	  ESP8266_TS_Send_Data_MultiField(&ESP_module, 5, sensors_data_buff);
+	  HAL_Delay(20000);
 
     /* USER CODE END WHILE */
 

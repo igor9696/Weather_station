@@ -61,8 +61,8 @@ all: main-build
 main-build: Weather_station.elf secondary-outputs
 
 # Tool invocations
-Weather_station.elf: $(OBJS) $(USER_OBJS) C:\Users\igur\STM32CubeIDE\training\Weather_station\STM32L031K6TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Weather_station.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\igur\STM32CubeIDE\training\Weather_station\STM32L031K6TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Weather_station.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Weather_station.elf: $(OBJS) $(USER_OBJS) C:\Users\igors\STM32CubeIDE\workspace_1.7.0\training\Weather_station\STM32L031K6TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Weather_station.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\igors\STM32CubeIDE\workspace_1.7.0\training\Weather_station\STM32L031K6TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Weather_station.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
