@@ -50,8 +50,10 @@ static ESP_status ESP8266_is_TCP_disconnected(ESP8266_t* ESP)
 
 static ESP_status ESP8266_CheckAT(ESP8266_t* ESP)
 {
+	RX_RESPOND_FLAG = 1;
 	UART_send_string("AT\r\n");
-	HAL_Delay(ESP_RESPOND_TIME);
+	//HAL_Delay(ESP_RESPOND_TIME);
+	while(RX_RESPOND_FLAG); // wait for receiving message
 
 	if(ESP8266_Check_OK_Respond(ESP) != ESP_OK)
 	{
@@ -65,12 +67,15 @@ static ESP_status ESP8266_CheckAT(ESP8266_t* ESP)
 
 static ESP_status ESP8266_Connect_To_Router(ESP8266_t* ESP)
 {
+	RX_RESPOND_FLAG = 1;
 	uint8_t message[36];
 	uint8_t length;
 	length = sprintf((char*)message, "AT+CWJAP=\"%s\",\"%s\"\r\n", ESP->SSID, ESP->PSWD);
 	UART_send_message((char*)message, length);
 
-	HAL_Delay(20000);
+	while(RX_RESPOND_FLAG);
+
+	HAL_Delay(5 * ESP_RESPOND_TIME);
 
 	if(ESP8266_Check_OK_Respond(ESP) != ESP_OK)
 	{
@@ -83,6 +88,7 @@ static ESP_status ESP8266_Connect_To_Router(ESP8266_t* ESP)
 
 ESP_status ESP8266_SetMode(ESP8266_t* ESP, ESP_mode mode)
 {
+	RX_RESPOND_FLAG = 1;
 	switch(mode)
 	{
 	case STATION:
@@ -98,8 +104,7 @@ ESP_status ESP8266_SetMode(ESP8266_t* ESP, ESP_mode mode)
 		break;
 	}
 
-	HAL_Delay(ESP_RESPOND_TIME);
-
+	while(RX_RESPOND_FLAG); // wait for receiving message
 	if(ESP8266_Check_OK_Respond(ESP) != ESP_OK)
 	{
 		return ESP_NOK;
@@ -138,6 +143,8 @@ ESP_status ESP8266_Init(ESP8266_t* ESP, char* SSID, char* PSWD, ESP_mode Mode)
 
 ESP_status ESP8266_SetConnectionMode(ESP8266_t* ESP, ESP_ConnectionMode mode)
 {
+	RX_RESPOND_FLAG = 1;
+
 	switch(mode)
 	{
 	case SINGLE_CONNECTION:
@@ -148,7 +155,7 @@ ESP_status ESP8266_SetConnectionMode(ESP8266_t* ESP, ESP_ConnectionMode mode)
 		break;
 	}
 
-	HAL_Delay(ESP_RESPOND_TIME);
+	while(RX_RESPOND_FLAG);
 	if(ESP8266_Check_OK_Respond(ESP) != ESP_OK)
 	{
 		return ESP_NOK;
@@ -161,6 +168,7 @@ ESP_status ESP8266_SetConnectionMode(ESP8266_t* ESP, ESP_ConnectionMode mode)
 
 ESP_status ESP8266_Connect_TCP(ESP8266_t* ESP, char* Target_IP, char* PORT, ESP_ConnectionMode mode)
 {
+	RX_RESPOND_FLAG = 1;
 	if(ESP8266_SetConnectionMode(ESP, mode) != ESP_OK)
 	{
 		ESP->ESP8266_status = ESP_NOK;
@@ -171,8 +179,7 @@ ESP_status ESP8266_Connect_TCP(ESP8266_t* ESP, char* Target_IP, char* PORT, ESP_
 	length = sprintf((char*)message, "AT+CIPSTART=\"TCP\",\"%s\",%s\r\n", Target_IP, PORT);
 	UART_send_message((char*)message, length);
 
-	HAL_Delay(5000);
-
+	while(RX_RESPOND_FLAG);
 	if(ESP8266_Check_OK_Respond(ESP) != ESP_OK)
 	{
 		ESP->ESP8266_status = ESP_NOK;
@@ -187,9 +194,10 @@ ESP_status ESP8266_Connect_TCP(ESP8266_t* ESP, char* Target_IP, char* PORT, ESP_
 
 ESP_status ESP8266_Disconnect_TCP(ESP8266_t* ESP)
 {
+	RX_RESPOND_FLAG = 1;
 	UART_send_string("AT+CIPCLOSE\r\n");
 
-	HAL_Delay(ESP_RESPOND_TIME);
+	while(RX_RESPOND_FLAG);
 	if(ESP8266_Check_OK_Respond(ESP) != ESP_OK)
 	{
 		return ESP_NOK;
@@ -222,11 +230,6 @@ ESP_status ESP8266_TS_Send_Data_MultiField(ESP8266_t* ESP, uint8_t number_of_fie
 		strcat(message, field_buff);
 	}
 
-//	for(int i=4; i < number_of_fields + 1; i++)
-//	{
-//		sprintf(field_buff, "&field%d=%g", i, data_buffer[i]);
-//		strcat(message, field_buff);
-//	}
 	strcat(message, "\r\n");
 
 	// send data length information

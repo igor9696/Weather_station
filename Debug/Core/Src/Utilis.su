@@ -1,2 +1,2 @@
-Utilis.c:10:6:UART_send_string	72	static
-Utilis.c:18:6:UART_send_message	8	static
+Utilis.c:10:6:UART_send_string	96	static
+Utilis.c:18:6:UART_send_message	16	static

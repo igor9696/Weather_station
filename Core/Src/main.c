@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usart.h"
@@ -31,7 +32,7 @@
 #include "dht11.h"
 #include "ESP01.h"
 #include "Utilis.h"
-#include "INA219.h"
+//#include "INA219.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,7 +55,7 @@ ESP8266_t ESP_module;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t UART_RX_val;
+uint8_t UART_RX_val[128];
 int32_t bmp_temp;
 uint32_t bmp_press;
 uint8_t dht11_humidity;
@@ -109,6 +110,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+
+  MX_DMA_Init();
+
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   MX_TIM2_Init();
@@ -116,9 +120,9 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  //HAL_UARTEx_ReceiveToIdle_DMA(&huart2, UART_RX_val, 32);
-  HAL_UART_Receive_IT(&huart2, &UART_RX_val, 1);
-  INA219_Init(&hi2c1, INA_I2C_ADDR);
+  HAL_UARTEx_ReceiveToIdle_DMA(&huart2, UART_RX_val, 128);
+  //HAL_UART_Receive_IT(&huart2, &UART_RX_val, 1);
+  //INA219_Init(&hi2c1, INA_I2C_ADDR);
   delay_init();
   DHT11_Init(&DHT11, DHT11_SIGNAL_GPIO_Port, DHT11_SIGNAL_Pin);
   BMP280_Init(&hi2c1, 0x77);
@@ -131,7 +135,7 @@ int main(void)
   while (1)
   {
 	  HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
-	  INA219_Get_Data_OneShot(&solar_voltage, &solar_current);
+	  //INA219_Get_Data_OneShot(&solar_voltage, &solar_current);
 	  BMP280_get_data_FORCED(&bmp_temp, &bmp_press);
 	  DHT11_get_data(&DHT11, &dht11_humidity, &dht11_temp, &dht11_check_sum);
 
@@ -212,30 +216,30 @@ static void MX_NVIC_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	if(huart->Instance == USART2)
-	{
-		RB_Buff_Write(&ESP_module.ESP_RX_Buff, UART_RX_val);
-	}
-	HAL_UART_Receive_IT(&huart2, &UART_RX_val, 1);
-}
-
-
-
-//void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 //{
 //	if(huart->Instance == USART2)
 //	{
-//		for(int i=0; i < Size; i++)
-//		{
-//
-//		}
-//
-//		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, UART_RX_val, 32);
+//		RB_Buff_Write(&ESP_module.ESP_RX_Buff, UART_RX_val);
 //	}
-//
+//	HAL_UART_Receive_IT(&huart2, &UART_RX_val, 1);
 //}
+
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+{
+	if(huart->Instance == USART2)
+	{
+		for(int i=0; i < Size; i++)
+		{
+			RB_Buff_Write(&ESP_module.ESP_RX_Buff, UART_RX_val[i]);
+		}
+
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, UART_RX_val, 128);
+		RX_RESPOND_FLAG = 0;
+
+	}
+}
 /* USER CODE END 4 */
 
 /**
