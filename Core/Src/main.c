@@ -126,7 +126,7 @@ int main(void)
   delay_init();
   DHT11_Init(&DHT11, DHT11_SIGNAL_GPIO_Port, DHT11_SIGNAL_Pin);
   BMP280_Init(&hi2c1, 0x77);
-  ESP8266_Init(&ESP_module, "t-mobil", "19962016igor", AP_STATION);
+  ESP8266_Init(&ESP_module, "xxxx", "xxxx", AP_STATION);
 
   /* USER CODE END 2 */
 
