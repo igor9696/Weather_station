@@ -20,6 +20,8 @@
 #define ESP_MessageSize			128
 
 
+volatile uint8_t RX_RESPOND_FLAG;
+
 typedef enum ESP_status
 {
 	ESP_NOK,

@@ -1,4 +1,4 @@
 delay.c:12:6:delay_init	8	static
-delay.c:19:6:delay_us	0	static
-delay.c:26:6:delay_ms	16	static
-delay.c:35:10:get_tick_us	0	static
+delay.c:19:6:delay_us	16	static
+delay.c:26:6:delay_ms	24	static
+delay.c:35:10:get_tick_us	16	static

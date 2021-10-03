@@ -1,3 +1,8 @@
+dht11.c:14:6:DHT11_Init	24	static
+dht11.c:22:13:change_to_output	48	static
+dht11.c:35:13:send_start_signal	16	static
+dht11.c:43:13:change_to_input	48	static
+dht11.c:57:13:check_response	16	static
 dht11.c:69:16:read_byte	24	static
-dht11.c:14:6:DHT11_Init	0	static
-dht11.c:113:6:DHT11_get_data	64	static
+dht11.c:95:13:read_data	48	static
+dht11.c:113:6:DHT11_get_data	24	static
