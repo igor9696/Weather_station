@@ -29,7 +29,7 @@ Core/Src/ESP01.o: ../Core/Src/ESP01.c ../Core/Inc/ESP01.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h \
  ../Core/Inc/Utilis.h ../Core/Inc/usart.h ../Core/Inc/RingBuffer.h \
- ../Core/Inc/parser.h
+ ../Core/Inc/parser.h ../Core/Inc/usart.h
 
 ../Core/Inc/ESP01.h:
 
@@ -100,3 +100,5 @@ Core/Src/ESP01.o: ../Core/Src/ESP01.c ../Core/Inc/ESP01.h \
 ../Core/Inc/RingBuffer.h:
 
 ../Core/Inc/parser.h:
+
+../Core/Inc/usart.h:

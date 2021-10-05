@@ -7,8 +7,10 @@
 
 
 #include "ESP01.h"
+#include "usart.h"
 
 extern const char API_Key[];
+extern uint8_t UART_RX_val;
 
 static ESP_status ESP8266_Check_OK_Respond(ESP8266_t* ESP)
 {
@@ -47,10 +49,14 @@ static ESP_status ESP8266_is_TCP_disconnected(ESP8266_t* ESP)
 }
 
 
-//static ESP_status ESP8266_Reset(ESP8266_t* ESP)
-//{
-//	UART_send_string("AT+RST\r\n");
-//}
+static ESP_status ESP8266_Disconnect(ESP8266_t* ESP)
+{
+	uint8_t message[36];
+	uint8_t length;
+	length = sprintf((char*)message, "AT+CWQAP\r\n");
+	UART_send_message((char*)message, length);
+	return ESP_OK;
+}
 
 
 static ESP_status ESP8266_EnterDeepSleep(ESP8266_t* ESP, uint32_t sleep_time_ms)
@@ -88,7 +94,8 @@ static ESP_status ESP8266_Connect_To_Router(ESP8266_t* ESP)
 	length = sprintf((char*)message, "AT+CWJAP=\"%s\",\"%s\"\r\n", ESP->SSID, ESP->PSWD);
 	UART_send_message((char*)message, length);
 
-	while(!ESP8266_Check_OK_Respond(ESP));
+	HAL_Delay(20000);
+	//while(!ESP8266_Check_OK_Respond(ESP));
 
 	RB_Flush(&ESP->ESP_RX_Buff); // clean buffer before next received message
 	return ESP_OK;
@@ -97,6 +104,8 @@ static ESP_status ESP8266_Connect_To_Router(ESP8266_t* ESP)
 ESP_status ESP8266_SetMode(ESP8266_t* ESP, ESP_mode mode)
 {
 	RX_RESPOND_FLAG = 1;
+	HAL_Delay(10000);
+
 	switch(mode)
 	{
 	case STATION:
@@ -111,8 +120,7 @@ ESP_status ESP8266_SetMode(ESP8266_t* ESP, ESP_mode mode)
 		UART_send_string("AT+CWMODE=3\r\n"); // Set WiFi mode to station mode + AP mode
 		break;
 	}
-
-	while(!ESP8266_Check_OK_Respond(ESP)); // wait for receiving  OK message
+	//while(!ESP8266_Check_OK_Respond(ESP)); // wait for receiving  OK message
 
 
 	RB_Flush(&ESP->ESP_RX_Buff); // clean buffer before next received message
@@ -124,16 +132,16 @@ ESP_status ESP8266_Init(ESP8266_t* ESP, char* SSID, char* PSWD, ESP_mode Mode)
 {
 	ESP->SSID = SSID;
 	ESP->PSWD = PSWD;
+	HAL_Delay(15000); // wait sec
+	ESP8266_Disconnect(ESP);
+
 	RingBuffer_Init(&ESP->ESP_RX_Buff);
-	HAL_Delay(5000); // wait sec
-
-
 	// TCP client connection config:
 	// 0. Check AT
-	if(ESP8266_CheckAT(ESP) != ESP_OK)
-	{
-		return ESP_NOK;
-	}
+//	if(ESP8266_CheckAT(ESP) != ESP_OK)
+//	{
+//		return ESP_NOK;
+//	}
 	// 1. Set WiFi mode
 	ESP8266_SetMode(ESP, Mode);
 	// 2. Connect to a router
@@ -153,8 +161,9 @@ ESP_status ESP8266_SetConnectionMode(ESP8266_t* ESP, ESP_ConnectionMode mode)
 		UART_send_string("AT+CIPMUX=1\r\n");
 		break;
 	}
+	HAL_Delay(5000);
 
-	while(!ESP8266_Check_OK_Respond(ESP));
+	//while(!ESP8266_Check_OK_Respond(ESP));
 
 	RB_Flush(&ESP->ESP_RX_Buff); // clean buffer before next received message
 	return ESP_OK;
@@ -169,8 +178,9 @@ ESP_status ESP8266_Connect_TCP(ESP8266_t* ESP, char* Target_IP, char* PORT, ESP_
 	uint8_t length;
 	length = sprintf((char*)message, "AT+CIPSTART=\"TCP\",\"%s\",%s\r\n", Target_IP, PORT);
 	UART_send_message((char*)message, length);
+	HAL_Delay(1000);
 
-	while(!ESP8266_Check_OK_Respond(ESP));
+	//while(!ESP8266_Check_OK_Respond(ESP));
 
 	RB_Flush(&ESP->ESP_RX_Buff); // clean buffer before next received message
 	ESP->ESP8266_status = ESP_OK;
@@ -182,7 +192,7 @@ ESP_status ESP8266_Disconnect_TCP(ESP8266_t* ESP)
 {
 	UART_send_string("AT+CIPCLOSE\r\n");
 
-	while(!ESP8266_Check_OK_Respond(ESP));
+	//while(!ESP8266_Check_OK_Respond(ESP));
 
 	RB_Flush(&ESP->ESP_RX_Buff); // clean buffer before next received message
 	return ESP_OK;
@@ -214,10 +224,10 @@ ESP_status ESP8266_TS_Send_Data_MultiField(ESP8266_t* ESP, uint8_t number_of_fie
 	sprintf(cipsend_buff, "AT+CIPSEND=%d\r\n", strlen(message));
 	UART_send_message(cipsend_buff, strlen(cipsend_buff));
 
-	HAL_Delay(ESP_RESPOND_TIME);
+	HAL_Delay(5 * ESP_RESPOND_TIME);
 	//while(!(Parser_simple_parse(">", ESP->MessageReceive)));
 	UART_send_message(message, strlen(message)); // send data
-	while(!ESP8266_Check_OK_Respond(ESP));
+	//while(!ESP8266_Check_OK_Respond(ESP));
 
 	// if TCP isn't closed
 	if(ESP8266_is_TCP_disconnected(ESP) != ESP_OK)
