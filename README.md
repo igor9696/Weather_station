@@ -8,7 +8,6 @@ Station sends data within 2 minutes period in order to minimize power consumptio
 - solar current
 - solar voltage
 
-
 ![ThingSpeak data graphs](weather_station.PNG)
 
 ## Things that I used in this project:
@@ -20,3 +19,8 @@ Station sends data within 2 minutes period in order to minimize power consumptio
 6. 18650 Li-Po battery
 7. Solar panel 1W 6V
 8. Solar panel regulator
+
+
+## Things to do before using this code
+1.  Enter your API key that comes from ThingSpeak into API_Key variable in the beggining of the code
+2.  In function ESP8266_Init specify your router name and password
