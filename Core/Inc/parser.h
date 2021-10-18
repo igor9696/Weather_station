@@ -14,8 +14,8 @@
 
 
 // function prototypes
-void Parser_clean_string(RingBuffer_t* RX_buffer, uint8_t Destination_buffer[]);
+void Parser_clean_string(RingBuffer_t* RX_buffer, RingBuffer_t* Destination_buffer);
 uint8_t Parser_parse_message(char* message, uint8_t buffer[]);
-uint8_t Parser_simple_parse(char* message, uint8_t buffer[]);
+uint8_t Parser_simple_parse(char* message, RingBuffer_t* source_buffer);
 
 #endif /* INC_PARSER_H_ */

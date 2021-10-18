@@ -8,12 +8,9 @@
 
 #include "parser.h"
 
-void Parser_clean_string(RingBuffer_t* RX_buffer, uint8_t Destination_buffer[])
+void Parser_clean_string(RingBuffer_t* RX_buffer, RingBuffer_t* Destination_buffer)
 {
 	uint8_t data_cnt = 0;
-
-
-	uint8_t j = 0;
 
 	data_cnt = RX_buffer->data_counter;
 	for(int i=0; i < data_cnt - 2; i++)
@@ -28,12 +25,14 @@ void Parser_clean_string(RingBuffer_t* RX_buffer, uint8_t Destination_buffer[])
 
 		else
 		{
-			Destination_buffer[j] = tmp;
-			j++;
+			RB_Buff_Write(Destination_buffer, tmp);
+
+//			Destination_buffer[j] = tmp;
+//			j++;
 		}
 	}
 
-	Destination_buffer[j] = '\0';
+	//Destination_buffer[j] = '\0';
 }
 
 uint8_t Parser_parse_message(char* message, uint8_t buffer[])
@@ -47,11 +46,11 @@ uint8_t Parser_parse_message(char* message, uint8_t buffer[])
 }
 
 
-uint8_t Parser_simple_parse(char* message, uint8_t buffer[])
+uint8_t Parser_simple_parse(char* message, RingBuffer_t* source_buffer)
 {
 	char *ptr;
 
-	ptr = strstr((char*)buffer, message);
+	ptr = strstr((char*)source_buffer->buffer, message);
 	if(ptr == NULL)
 	{
 		return 0;
