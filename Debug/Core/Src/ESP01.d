@@ -22,14 +22,18 @@ Core/Src/ESP01.o: ../Core/Src/ESP01.c ../Core/Inc/ESP01.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_flash_ramfunc.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2c.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2c_ex.h \
+ ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_iwdg.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr_ex.h \
+ ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc.h \
+ ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim_ex.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h \
  ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h \
  ../Core/Inc/Utilis.h ../Core/Inc/usart.h ../Core/Inc/RingBuffer.h \
- ../Core/Inc/parser.h
+ ../Core/Inc/parser.h ../Core/Inc/rtc_utilis.h ../Core/Inc/rtc.h \
+ ../Core/Inc/usart.h
 
 ../Core/Inc/ESP01.h:
 
@@ -81,9 +85,15 @@ Core/Src/ESP01.o: ../Core/Src/ESP01.c ../Core/Inc/ESP01.h \
 
 ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2c_ex.h:
 
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_iwdg.h:
+
 ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr.h:
 
 ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr_ex.h:
+
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc.h:
+
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h:
 
 ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim.h:
 
@@ -100,3 +110,9 @@ Core/Src/ESP01.o: ../Core/Src/ESP01.c ../Core/Inc/ESP01.h \
 ../Core/Inc/RingBuffer.h:
 
 ../Core/Inc/parser.h:
+
+../Core/Inc/rtc_utilis.h:
+
+../Core/Inc/rtc.h:
+
+../Core/Inc/usart.h:

@@ -21,6 +21,8 @@
 #include "main.h"
 #include "dma.h"
 #include "i2c.h"
+#include "iwdg.h"
+#include "rtc.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -32,7 +34,8 @@
 #include "dht11.h"
 #include "ESP01.h"
 #include "Utilis.h"
-//#include "INA219.h"
+#include "rtc_utilis.h"
+#include "INA219.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,6 +66,7 @@ int8_t dht11_temp;
 uint8_t dht11_check_sum;
 uint16_t solar_voltage;
 uint8_t solar_current;
+RTC_TimeTypeDef rtc_time;
 
 uint16_t sensors_data_buff[5];
 
@@ -110,23 +114,25 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-
   MX_DMA_Init();
 
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   MX_TIM2_Init();
+  MX_RTC_Init();
+  MX_IWDG_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   HAL_UARTEx_ReceiveToIdle_DMA(&huart2, UART_RX_val, 128);
   //HAL_UART_Receive_IT(&huart2, &UART_RX_val, 1);
-  //INA219_Init(&hi2c1, INA_I2C_ADDR);
+  INA219_Init(&hi2c1, INA_I2C_ADDR);
   delay_init();
   DHT11_Init(&DHT11, DHT11_SIGNAL_GPIO_Port, DHT11_SIGNAL_Pin);
   BMP280_Init(&hi2c1, 0x77);
-  ESP8266_Init(&ESP_module, "xxxx", "xxxx", AP_STATION);
+  HAL_IWDG_Refresh(&hiwdg);
+  ESP8266_Init(&ESP_module, "Wifi_name", "password", STATION);
 
   /* USER CODE END 2 */
 
@@ -134,8 +140,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
-	  //INA219_Get_Data_OneShot(&solar_voltage, &solar_current);
+	  INA219_Get_Data_OneShot(&solar_voltage, &solar_current);
 	  BMP280_get_data_FORCED(&bmp_temp, &bmp_press);
 	  DHT11_get_data(&DHT11, &dht11_humidity, &dht11_temp, &dht11_check_sum);
 
@@ -145,9 +150,12 @@ int main(void)
 	  sensors_data_buff[3] = solar_voltage;
 	  sensors_data_buff[4] = solar_current;
 
+	  HAL_IWDG_Refresh(&hiwdg);
 	  ESP8266_TS_Send_Data_MultiField(&ESP_module, 5, sensors_data_buff);
-	  HAL_Delay(20000);
 
+	  //ESP8266_EnterLightSleep(&ESP_module, 0, 0);
+	  ESP8266_EnterDeepSleep(&ESP_module, ESP_STOP_TIME_BETWEEN_SENDING_DATA);
+	  Entry_LowPowerMode(ESP_STOP_TIME_BETWEEN_SENDING_DATA);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -168,12 +176,19 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+  /** Configure LSE Drive Capability
+  */
+  HAL_PWR_EnableBkUpAccess();
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI
+                              |RCC_OSCILLATORTYPE_LSE;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLLMUL_3;
@@ -195,9 +210,11 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1
+                              |RCC_PERIPHCLK_RTC;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
+  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
@@ -213,19 +230,12 @@ static void MX_NVIC_Init(void)
   /* USART2_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(USART2_IRQn);
+  /* RTC_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(RTC_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(RTC_IRQn);
 }
 
 /* USER CODE BEGIN 4 */
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-//{
-//	if(huart->Instance == USART2)
-//	{
-//		RB_Buff_Write(&ESP_module.ESP_RX_Buff, UART_RX_val);
-//	}
-//	HAL_UART_Receive_IT(&huart2, &UART_RX_val, 1);
-//}
-
-
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
 	if(huart->Instance == USART2)
@@ -236,8 +246,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 		}
 
 		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, UART_RX_val, 128);
-		RX_RESPOND_FLAG = 0;
-
 	}
 }
 /* USER CODE END 4 */
