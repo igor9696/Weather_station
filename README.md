@@ -9,6 +9,8 @@ Station sends data within 2 minutes period in order to minimize power consumptio
 - solar voltage
 
 
+![ThingSpeak data graphs](weather_station.png)
+
 ## Things that I used in this project:
 1. STM32 NUCLEO L031K6
 2. DHT11 Humidity sensor
